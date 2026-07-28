@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍌 Minions Birthday Party!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --minion-yellow: #FFE135;
+            --minion-blue: #0055A4;
+            --minion-dark: #2C3E50;
+            --banana-yellow: #FFF44F;
+            --overalls-blue: #4169E1;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #FFE135 0%, #FFD700 50%, #FFA500 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .falling-bananas {
+            position: fixed; width: 100%; height: 100%;
+            top: 0; left: 0; pointer-events: none; z-index: 1; overflow: hidden;
+        }
+
+        .banana {
+            position: absolute; font-size: 30px;
+            animation: fall linear infinite; opacity: 0.6;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .bubbles {
+            position: fixed; width: 100%; height: 100%;
+            top: 0; left: 0; pointer-events: none; z-index: 0;
+        }
+
+        .bubble {
+            position: absolute; bottom: -100px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            to { bottom: 100vh; transform: translateX(100px); }
+        }
+
+        .login-container {
+            position: relative; z-index: 10;
+            min-height: 100vh; display: flex;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); border-radius: 30px;
+            padding: 50px 40px; max-width: 500px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 10px rgba(255, 225, 53, 0.3);
+            animation: slideIn 0.6s ease-out, float 6s ease-in-out infinite;
+            position: relative; overflow: hidden;
+        }
+
+        .login-box::before {
+            content: ''; position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 225, 53, 0.05) 10px, rgba(255, 225, 53, 0.05) 20px);
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-50px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .logo-container { text-align: center; margin-bottom: 30px; position: relative; z-index: 1; }
+
+        .logo-gif {
+            width: 150px; height: 150px; object-fit: contain;
+            margin: 0 auto 20px; animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+
+        .main-title {
+            font-family: 'Bangers', cursive; font-size: 3em;
+            color: var(--minion-blue);
+            text-shadow: 3px 3px 0px var(--minion-yellow), 6px 6px 0px rgba(0,0,0,0.2);
+            margin-bottom: 10px; animation: titlePulse 2s infinite; letter-spacing: 3px;
+        }
+
+        @keyframes titlePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .subtitle { font-size: 1.2em; color: #666; margin-bottom: 30px; font-weight: 700; }
+
+        .form-group { margin-bottom: 25px; position: relative; z-index: 1; }
+
+        .form-group label {
+            display: block; margin-bottom: 8px; color: var(--minion-blue);
+            font-weight: 900; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .input-wrapper { position: relative; }
+
+        .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 1.3em; }
+
+        .form-group input {
+            width: 100%; padding: 15px 15px 15px 50px; font-size: 16px;
+            border: 3px solid #ddd; border-radius: 15px; transition: all 0.3s;
+            background: white; font-family: 'Nunito', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none; border-color: var(--minion-yellow);
+            box-shadow: 0 0 20px rgba(255, 225, 53, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff4444, #cc0000); color: white;
+            padding: 15px; border-radius: 12px; margin-bottom: 20px;
+            display: none; animation: shake 0.5s, slideIn 0.3s;
+            font-weight: 700; position: relative; z-index: 1;
+        }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--minion-yellow) 0%, var(--banana-yellow) 100%);
+            color: var(--minion-dark); border: none; padding: 18px;
+            font-size: 20px; font-weight: 900; border-radius: 15px;
+            cursor: pointer; transition: all 0.3s; margin-top: 10px;
+            text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(255, 225, 53, 0.4);
+            position: relative; z-index: 1; font-family: 'Bangers', cursive;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 225, 53, 0.6);
+        }
+
+        .login-btn::after {
+            content: '🍌'; position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); animation: wiggle 2s infinite;
+        }
+
+        @keyframes wiggle { 0%, 100% { transform: translateY(-50%) rotate(0deg); } 25% { transform: translateY(-50%) rotate(-10deg); } 75% { transform: translateY(-50%) rotate(10deg); } }
+
+        .invitation-container {
+            display: none; position: relative; z-index: 10;
+            min-height: 100vh; padding: 20px;
+        }
+
+        .invitation-card {
+            max-width: 800px; margin: 0 auto; background: white;
+            border-radius: 30px; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            animation: cardEntrance 1s ease-out;
+        }
+
+        @keyframes cardEntrance { from { opacity: 0; transform: translateY(50px) rotateX(20deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
+
+        .invitation-header {
+            background: linear-gradient(135deg, var(--minion-yellow) 0%, var(--banana-yellow) 100%);
+            padding: 40px 30px; text-align: center; position: relative; overflow: hidden;
+        }
+
+        .invitation-header h1 {
+            font-family: 'Bangers', cursive; font-size: 3.5em;
+            color: var(--minion-blue);
+            text-shadow: 4px 4px 0px rgba(255,255,255,0.8), 8px 8px 0px rgba(0,0,0,0.2);
+            margin-bottom: 10px; animation: headerBounce 2s infinite;
+        }
+
+        @keyframes headerBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .dancing-minion { width: 120px; height: 120px; margin: 20px auto; animation: dance 1s infinite; }
+
+        @keyframes dance { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } }
+
+        .invitation-body { padding: 40px 30px; text-align: center; background: linear-gradient(to bottom, #fffef0, #ffffff); }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--minion-blue), var(--overalls-blue));
+            color: white; padding: 25px; border-radius: 20px;
+            margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0, 85, 164, 0.3);
+            animation: glow 3s infinite;
+        }
+
+        @keyframes glow { 0%, 100% { box-shadow: 0 10px 30px rgba(0, 85, 164, 0.3); } 50% { box-shadow: 0 10px 50px rgba(0, 85, 164, 0.6); } }
+
+        .welcome-banner h2 { font-family: 'Bangers', cursive; font-size: 2.2em; margin-bottom: 10px; letter-spacing: 2px; }
+
+        .user-name-highlight {
+            display: inline-block; background: var(--minion-yellow);
+            color: var(--minion-dark); padding: 10px 30px; border-radius: 50px;
+            font-size: 1.3em; font-weight: 900; margin-top: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .invitation-image-container {
+            position: relative; margin: 30px 0; border-radius: 20px;
+            overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: rotate(-2deg); transition: transform 0.3s;
+        }
+
+        .invitation-image-container:hover { transform: rotate(0deg) scale(1.02); }
+
+        .invitation-image { width: 100%; display: block; border-radius: 15px; }
+
+        .image-frame {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 5px solid var(--minion-yellow); border-radius: 25px;
+            pointer-events: none; animation: frameRotate 10s linear infinite;
+        }
+
+        @keyframes frameRotate { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+
+        .event-details {
+            background: white; border: 4px dashed var(--minion-yellow);
+            border-radius: 20px; padding: 30px; margin: 30px 0; position: relative;
+        }
+
+        .detail-row {
+            display: flex; justify-content: center; align-items: center;
+            margin: 20px 0; font-size: 1.3em; padding: 15px;
+            background: rgba(255, 225, 53, 0.1); border-radius: 12px; transition: all 0.3s;
+        }
+
+        .detail-row:hover { background: rgba(255, 225, 53, 0.3); transform: translateX(10px); }
+
+        .detail-icon { font-size: 1.5em; margin-right: 15px; }
+
+        .detail-label { font-weight: 900; color: var(--minion-blue); margin-right: 10px; min-width: 100px; text-align: left; }
+
+        .detail-value { font-weight: 700; color: var(--minion-dark); flex: 1; text-align: left; }
+
+        .packing-list {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+            border: 4px solid var(--minion-yellow); border-radius: 25px;
+            padding: 35px 30px; margin: 30px 0; position: relative;
+            box-shadow: 0 15px 40px rgba(255, 225, 53, 0.3);
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .packing-list::before {
+            content: '🎒'; position: absolute; top: -25px; left: 50%;
+            transform: translateX(-50%); background: white; padding: 0 25px;
+            font-size: 2.5em; border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: bounce 2s infinite;
+        }
+
+        .packing-title {
+            font-family: 'Bangers', cursive; font-size: 2.2em;
+            color: var(--minion-blue); text-align: center; margin-bottom: 25px;
+            text-shadow: 2px 2px 0px rgba(255, 225, 53, 0.5); letter-spacing: 2px;
+        }
+
+        .packing-subtitle { text-align: center; color: #666; font-size: 1.1em; margin-bottom: 30px; font-weight: 700; }
+
+        .packing-items { list-style: none; padding: 0; }
+
+        .packing-item {
+            display: flex; align-items: center; padding: 18px 20px;
+            margin: 15px 0; background: white; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+
+        .packing-item::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background: linear-gradient(to bottom, var(--minion-yellow), var(--banana-yellow));
+            transition: width 0.3s;
+        }
+
+        .packing-item:hover { transform: translateX(10px) scale(1.02); }
+
+        .packing-item:hover::before { width: 8px; }
+
+        .item-number {
+            background: linear-gradient(135deg, var(--minion-yellow), var(--banana-yellow));
+            color: var(--minion-dark); width: 40px; height: 40px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.2em; margin-right: 20px; flex-shrink: 0;
+            font-family: 'Bangers', cursive;
+        }
+
+        .item-icon { font-size: 2em; margin-right: 20px; flex-shrink: 0; animation: iconBounce 2s infinite; }
+
+        @keyframes iconBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(5deg); } }
+
+        .item-text { flex: 1; text-align: left; font-size: 1.15em; color: var(--minion-dark); font-weight: 700; line-height: 1.4; }
+
+        .item-text .highlight { color: var(--minion-blue); font-weight: 900; }
+
+        .item-note { display: block; font-size: 0.85em; color: #888; font-weight: 400; margin-top: 5px; font-style: italic; }
+
+        .rsvp-section {
+            background: linear-gradient(135deg, var(--minion-yellow), var(--banana-yellow));
+            padding: 25px; border-radius: 15px; margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(255, 225, 53, 0.4);
+        }
+
+        .rsvp-section h3 { font-family: 'Bangers', cursive; font-size: 1.8em; color: var(--minion-blue); margin-bottom: 10px; }
+
+        .confetti-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 100;
+        }
+
+        .confetti {
+            position: absolute; width: 10px; height: 10px;
+            background: var(--minion-yellow); animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall { 0% { transform: translateY(-100px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff4444, #cc0000); color: white;
+            border: none; padding: 15px 40px; font-size: 18px; font-weight: 900;
+            border-radius: 50px; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(255, 68, 68, 0.4); transition: all 0.3s;
+            font-family: 'Bangers', cursive; letter-spacing: 2px;
+        }
+
+        .logout-btn:hover { transform: translateY(-3px) scale(1.05); }
+
+        .minion-decoration {
+            position: fixed; font-size: 3em; opacity: 0.2;
+            pointer-events: none; z-index: 0;
+            animation: float-decoration 10s ease-in-out infinite;
+        }
+
+        @keyframes float-decoration { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-30px) rotate(10deg); } }
+
+        .sound-controls {
+            position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;
+        }
+
+        .sound-btn {
+            background: var(--minion-yellow); border: 3px solid var(--minion-blue);
+            border-radius: 50%; width: 50px; height: 50px; font-size: 24px;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .sound-btn:hover { transform: scale(1.1); }
+
+        .sound-btn.muted { background: #ccc; opacity: 0.6; }
+
+        .sound-status {
+            position: fixed; top: 80px; right: 20px; z-index: 1000;
+            background: white; padding: 10px 15px; border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-weight: 700;
+            color: var(--minion-blue); font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .main-title { font-size: 2em; }
+            .invitation-header h1 { font-size: 2.2em; }
+            .welcome-banner h2 { font-size: 1.5em; }
+            .detail-row { font-size: 1em; flex-direction: column; text-align: center; }
+            .detail-label { min-width: auto; margin-bottom: 5px; }
+            .packing-title { font-size: 1.6em; }
+            .packing-item { flex-wrap: wrap; }
+            .item-icon { margin-right: 10px; }
+            .item-text { font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="minionsMusic" loop preload="auto">
+        <source src="minions-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="sound-controls">
+        <button class="sound-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔊</button>
+    </div>
+
+    <div class="sound-status" id="soundStatus">🔇 Нажми для включения звука</div>
+
+    <div class="falling-bananas" id="fallingBananas"></div>
+    <div class="bubbles" id="bubbles"></div>
+
+    <img src="goggles.png" alt="" class="minion-decoration" style="top: 10%; left: 5%; width: 80px; opacity: 0.3;" onerror="this.style.display='none'">
+    <img src="banana-icon.png" alt="" class="minion-decoration" style="top: 60%; right: 5%; width: 60px; opacity: 0.3; animation-delay: 2s;" onerror="this.style.display='none'">
+    <div class="minion-decoration" style="bottom: 10%; left: 10%; animation-delay: 4s;">🎉</div>
+
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="logo-container">
+                <img src="minion-dance.gif" alt="Minion" class="logo-gif" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👾</text></svg>'">
+                <h1 class="main-title">MINIONS PARTY</h1>
+                <p class="subtitle">Введите данные для доступа к приглашению</p>
+            </div>
+
+            <div class="error-message" id="errorMessage">⚠️ Неверный логин или пароль!</div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">👤 Логин</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"></span>
+                        <input type="text" id="username" placeholder="Введите ваш логин" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">🔒 Пароль</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"></span>
+                        <input type="password" id="password" placeholder="Введите ваш пароль" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="invitation-container" id="invitationScreen">
+        <div class="invitation-card">
+            <div class="invitation-header">
+                <img src="minion-waving.gif" alt="Dancing Minion" class="dancing-minion" onerror="this.style.display='none'">
+                <h1>YOU'RE INVITED!</h1>
+            </div>
+
+            <div class="invitation-body">
+                <div class="welcome-banner">
+                    <h2>Приветствуем!</h2>
+                    <p>Это персональное приглашение для:</p>
+                    <div class="user-name-highlight" id="userNameDisplay">Guest</div>
+                </div>
+
+                <div class="invitation-image-container">
+                    <div class="image-frame"></div>
+                    <img src="" alt="Birthday Invitation" class="invitation-image" id="invitationImage">
+                </div>
+
+                <div class="event-details">
+                    <div class="detail-row">
+                        <span class="detail-icon">📅</span>
+                        <span class="detail-label">Дата:</span>
+                        <span class="detail-value">7 Августа</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">🕐</span>
+                        <span class="detail-label">Время:</span>
+                        <span class="detail-value">16:30</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">📍</span>
+                        <span class="detail-label">Место:</span>
+                        <span class="detail-value">D. Chumoytlo, 26 Shkolnaya St.</span>
+                    </div>
+                </div>
+
+                <div class="packing-list">
+                    <h2 class="packing-title">🎒 ЧТО ВЗЯТЬ С СОБОЙ 🎒</h2>
+                    <p class="packing-subtitle">Самое главное для идеальной вечеринки!</p>
+                    
+                    <ul class="packing-items">
+                        <li class="packing-item">
+                            <div class="item-number">1</div>
+                            <div class="item-icon">😄</div>
+                            <div class="item-text">
+                                <span class="highlight">Хорошее настроение</span> и всё, что с ним связано
+                                <span class="item-note">Улыбки, смех и позитив обязательны!</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">2</div>
+                            <div class="item-icon">🧖</div>
+                            <div class="item-text">
+                                <span class="highlight">Всё для бани</span>
+                                <span class="item-note">Полотенца, веники, шапочки, средства для мытья, сменную одежду</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">3</div>
+                            <div class="item-icon">👕</div>
+                            <div class="item-text">
+                                <span class="highlight">Домашнюю одежду</span>
+                                <span class="item-note">Чтобы было уютно и комфортно</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">4</div>
+                            <div class="item-icon">🎁</div>
+                            <div class="item-text">
+                                <span class="highlight">Подарочек</span> (если такой есть)
+                                <span class="item-note">Внимание важнее всего, но приятности всегда радуют!</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">5</div>
+                            <div class="item-icon"></div>
+                            <div class="item-text">
+                                <span class="highlight">Bluetooth колонку</span>
+                                <span class="item-note">Без музыки какая же вечеринка?</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">6</div>
+                            <div class="item-icon">📱</div>
+                            <div class="item-text">
+                                <span class="highlight">Зарядку для телефона</span>
+                                <span class="item-note">Чтобы не пропустить ни одного момента!</span>
+                            </div>
+                        </li>
+                        <li class="packing-item">
+                            <div class="item-number">7</div>
+                            <div class="item-icon">📸</div>
+                            <div class="item-text">
+                                <span class="highlight">Хорошую камеру</span> или телефон с фотоаппаратом
+                                <span class="item-note">Запечатлеем лучшие моменты вечера!</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="rsvp-section">
+                    <h3>📝 RSVP</h3>
+                    <p style="font-size: 1.2em; font-weight: 700; color: #333;">
+                        Будьте добры ответить в течение дня!<br>
+                        <span style="font-size: 0.9em;">Мы ждем вас! </span>
+                    </p>
+                </div>
+
+                <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+    // ===== ЗВУКОВАЯ СИСТЕМА С MP3 =====
+    let musicEnabled = false;
+    let effectsEnabled = true;
+    let audioContext = null;
+
+    // Инициализация аудио
+    function initAudio() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        musicEnabled = true;
+        
+        document.getElementById('musicBtn').classList.remove('muted');
+        document.getElementById('musicBtn').textContent = '🎵';
+        
+        const enableBtn = document.getElementById('enableSoundBtn');
+        if (enableBtn) enableBtn.style.display = 'none';
+        
+        console.log('✅ Звук включён!');
+    }
+
+    // Звук успеха (через Web Audio API - короткий)
+    function playSuccessSound() {
+        if (!effectsEnabled || !audioContext) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            setTimeout(() => playTone(freq, 0.15, 'sine', 0.3), i * 100);
+        });
+    }
+
+    // Звук миньона
+    function playMinionSound() {
+        if (!effectsEnabled || !audioContext) return;
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                const freq = 800 + Math.random() * 600;
+                playTone(freq, 0.1, 'square', 0.15);
+            }, i * 80);
+        }
+    }
+
+    // Звук ошибки
+    function playErrorSound() {
+        if (!effectsEnabled || !audioContext) return;
+        playTone(200, 0.3, 'sawtooth', 0.2);
+        setTimeout(() => playTone(150, 0.3, 'sawtooth', 0.2), 200);
+    }
+
+    // Базовый звук
+    function playTone(frequency, duration, type = 'sine', volume = 0.2) {
+        if (!audioContext) return;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    // ===== МУЗЫКА ЧЕРЕЗ MP3 =====
+    function startMusic() {
+        if (!musicEnabled) return;
+        
+        const music = document.getElementById('minionsMusic');
+        music.volume = 0.4; // Громкость (0.0 до 1.0)
+        
+        music.play().then(() => {
+            console.log(' Музыка играет!');
+        }).catch(err => {
+            console.error('❌ Ошибка воспроизведения:', err);
+        });
+    }
+
+    function stopMusic() {
+        const music = document.getElementById('minionsMusic');
+        music.pause();
+        music.currentTime = 0;
+    }
+
+    // Управление музыкой
+    function toggleMusic() {
+        const music = document.getElementById('minionsMusic');
+        
+        if (!audioContext) {
+            initAudio();
+            startMusic();
+            return;
+        }
+        
+        musicEnabled = !musicEnabled;
+        const btn = document.getElementById('musicBtn');
+        
+        if (musicEnabled) {
+            btn.classList.remove('muted');
+            btn.textContent = '🎵';
+            music.play();
+        } else {
+            btn.classList.add('muted');
+            btn.textContent = '';
+            music.pause();
+        }
+    }
+
+    // ===== ОСНОВНОЙ КОД =====
+    const users = {
+        'Admin': 'Max0408', 'MahimtzyanovIR': 'Birthday0408', 'AfanasievD': 'Birthday0408',
+        'KuznetsovA': 'Birthday0408', 'LebedevD': 'Birthday0408', 'GanievaR': 'Birthday0408',
+        'RemnyakovaD': 'Birthday0408', 'MinemullinaA': 'Birthday0408', 'KasyanovaTA': 'Birthday0408',
+        'SorokinSS': 'Birthday0408', 'AfanasievID': 'Birthday0408', 'HabibullinaR': 'Birthday0408',
+        'MuhametovaL': 'Birthday0408', 'OdintsovaS': 'Birthday0408', 'Iluha': 'Birthday0408',
+        'NikulinaEY': 'Birthday0408', 'HahinYu': 'Birthday0408', 'ObuhovaPP': 'Birthday0408',
+        'BeresnevaVD': 'Birthday0408'
+    };
+
+    const realNames = {
+        'Admin': 'Максим (Админ)', 'MahimtzyanovIR': 'Ильназ', 'AfanasievD': 'Даня',
+        'KuznetsovA': 'Артем', 'LebedevD': 'Данил', 'GanievaR': 'Русалина',
+        'RemnyakovaD': 'Дарина', 'MinemullinaA': 'Алина', 'KasyanovaTA': 'Таня',
+        'SorokinSS': 'Степ', 'AfanasievID': 'Иван', 'HabibullinaR': 'Руслана',
+        'MuhametovaL': 'Леся', 'OdintsovaS': 'Софья', 'Iluha': 'Илюха',
+        'NikulinaEY': 'Евгения', 'HahinYu': 'Юрий', 'ObuhovaPP': 'Полина',
+        'BeresnevaVD': 'Вика'
+    };
+
+    const personalInvitations = {
+        'Admin': 'invitation-Admin.jpg', 'MahimtzyanovIR': 'invitation-MahimtzyanovIR.jpg',
+        'AfanasievD': 'invitation-AfanasievD.jpg', 'KuznetsovA': 'invitation-KuznetsovA.jpg',
+        'LebedevD': 'invitation-LebedevD.jpg', 'GanievaR': 'invitation-GanievaR.jpg',
+        'RemnyakovaD': 'invitation-RemnyakovaD.jpg', 'MinemullinaA': 'invitation-MinemullinaA.jpg',
+        'KasyanovaTA': 'invitation-KasyanovaTA.jpg', 'SorokinSS': 'invitation-SorokinSS.jpg',
+        'AfanasievID': 'invitation-AfanasievID.jpg', 'HabibullinaR': 'invitation-HabibullinaR.jpg',
+        'MuhametovaL': 'invitation-MuhametovaL.jpg', 'OdintsovaS': 'invitation-OdintsovaS.jpg',
+        'Iluha': 'invitation-Iluha.jpg', 'NikulinaEY': 'invitation-NikulinaEY.jpg',
+        'HahinYu': 'invitation-HahinYu.jpg', 'ObuhovaPP': 'invitation-ObuhovaPP.jpg',
+        'BeresnevaVD': 'invitation-BeresnevaVD.jpg'
+    };
+
+    function createFallingBananas() {
+        const container = document.getElementById('fallingBananas');
+        const emojis = ['🍌', '👾', '🎉', '✨'];
+        setInterval(() => {
+            const banana = document.createElement('div');
+            banana.className = 'banana';
+            banana.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            banana.style.left = Math.random() * 100 + '%';
+            banana.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            banana.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            container.appendChild(banana);
+            setTimeout(() => banana.remove(), 10000);
+        }, 1000);
+    }
+
+    function createBubbles() {
+        const container = document.getElementById('bubbles');
+        for (let i = 0; i < 15; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const size = Math.random() * 60 + 20;
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            bubble.style.animationDelay = Math.random() * 10 + 's';
+            container.appendChild(bubble);
+        }
+    }
+
+    function createConfetti() {
+        const container = document.getElementById('confettiContainer');
+        const colors = ['#FFE135', '#0055A4', '#FF6B6B', '#4ECDC4', '#FFD700'];
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }, i * 50);
+        }
+    }
+
+    function createPersonalInvitation(username) {
+        const img = document.getElementById('invitationImage');
+        const path = personalInvitations[username];
+        if (path) {
+            img.src = path + '?t=' + new Date().getTime();
+        }
+    }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorMessage = document.getElementById('errorMessage');
+        
+        if (users[username] && users[username] === password) {
+            errorMessage.style.display = 'none';
+            
+            if (!audioContext) initAudio();
+            
+            playSuccessSound();
+            setTimeout(() => playMinionSound(), 300);
+            
+            showInvitation(username);
+            createConfetti();
+            
+            setTimeout(() => startMusic(), 500);
+        } else {
+            errorMessage.style.display = 'block';
+            document.getElementById('password').value = '';
+            playErrorSound();
+            
+            const loginBox = document.querySelector('.login-box');
+            loginBox.style.animation = 'none';
+            setTimeout(() => {
+                loginBox.style.animation = 'slideIn 0.6s ease-out, float 6s ease-in-out infinite';
+            }, 10);
+        }
+    }
+
+    function showInvitation(username) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('invitationScreen').style.display = 'block';
+        
+        const realName = realNames[username] || username;
+        document.getElementById('userNameDisplay').textContent = realName;
+        
+        createPersonalInvitation(username);
+        
+        document.body.style.overflow = 'auto';
+        sessionStorage.setItem('currentUser', username);
+        window.scrollTo(0, 0);
+    }
+
+    function logout() {
+        stopMusic();
+        document.getElementById('invitationScreen').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('errorMessage').style.display = 'none';
+        sessionStorage.removeItem('currentUser');
+    }
+
+    window.onload = function() {
+        createFallingBananas();
+        createBubbles();
+        
+        const savedUser = sessionStorage.getItem('currentUser');
+        if (savedUser && users[savedUser]) {
+            showInvitation(savedUser);
+        }
+    };
+
+    document.addEventListener('mousemove', (e) => {
+        const decorations = document.querySelectorAll('.minion-decoration');
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        decorations.forEach((dec, index) => {
+            const speed = (index + 1) * 20;
+            dec.style.transform = `translate(${(0.5 - x) * speed}px, ${(0.5 - y) * speed}px)`;
+        });
+    });
+</script>
+</body>
+</html>
